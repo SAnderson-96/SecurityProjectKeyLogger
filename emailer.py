@@ -25,7 +25,7 @@ class Emailer:
         self.server.ehlo() # Make connection
         self.server.login(self.gmail_user, self.password) # Login
 
-    def send_email(self, recipients: object, subject: str, body: str) -> None:
+    def send_email(self, subject: str, body: str, recipients: object = None) -> None:
         '''Sends an email from the arguments provided
         
         Parameters
