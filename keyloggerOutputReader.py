@@ -1,0 +1,2 @@
+with open("interpreted-output.txt", 'w') as file:
+    file.write("erPassword1\n\nctrlv\n24backspacebackspace12/26\n849ctrls!CLICK!!CLICK!!CLICK!!CLICK!!CLICK!ctrlbackspacebackspacebackspace4024007149506544\t1226!CLICK!!CLICK!!CLICK!!CLICK!!CLICK!!CLICK!!CLICK!!CLICK!!CLICK!!CLICK!!CLICK!!CLICK!!CLICK!!CLICK!!CLICK!")
